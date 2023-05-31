@@ -188,7 +188,7 @@ export class Web3Service {
       .send({ from: selectedAddress, gas: gasEstimate })
   }
 
-  async onClaimDepositButtonClick(contractID: string) {
+  async claimDeposit(contractID: string) {
 
     if (!this.web3) {
       console.error('MetaMask not connected');
@@ -240,6 +240,7 @@ export class Web3Service {
       }
       
       if(functionName == "userMarkedRideComplete"){
+        this.claimDeposit(rideContractAddress);
         console.log("Super hat alles geklappt");
       }
 

@@ -237,6 +237,7 @@ export class Web3Service {
         this.setRideProviderStartedRide(rideContractAddress, "Hallo Welt4")
         await new Promise(resolve => setTimeout(resolve, 10000));
         this.setRideProviderArrivedAtDropoffLocation(rideContractAddress, "Hallo Welt5");
+        await new Promise(resolve => setTimeout(resolve, 10000));
       }
       
       if(functionName == "userMarkedRideComplete"){

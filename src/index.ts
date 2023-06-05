@@ -38,13 +38,13 @@ async function carRun() {
     await new Promise(resolve => setTimeout(resolve, 12000));
 
     await web3Service.listenForUpdates(contractAddress);
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 12000));
 
     await web3Service.setRideProviderAcceptedStatus(contractAddress, "Hallo Welt2");
-    await new Promise(resolve => setTimeout(resolve, 10000));
+    await new Promise(resolve => setTimeout(resolve, 12000));
 
     await web3Service.setRideProviderArrivedAtPickupLocation(contractAddress, "Hallo Welt3");
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise(resolve => setTimeout(resolve, 12000));
     //await web3Service.setRideProviderStartedRide(contactAdress, "Hallo Welt4");
     //await web3Service.setRideProviderArrivedAtDropoffLocation(contactAdress, "Hallo Welt5");
 }

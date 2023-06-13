@@ -2,6 +2,9 @@ import Web3 from 'web3';
 import  Contract from 'web3'
 import { AbiItem } from 'web3-utils';
 import contractAbi from './abi-files/contractAbi.json';
+import { rideInProcessSwitch, bidAmount } from '.';
+
+
 
 export class Web3Service {
 
@@ -16,15 +19,15 @@ export class Web3Service {
   userMarkedRideComplete: boolean = false;
   userCanceldRide: boolean = false;
 
+
+
   async connectWallet() {
     try {
-      const privateKey = "0xc1e8b01ac7feb373cad1e388a8da8571d1721834e80c68acd13fd9564041b7b4"; // replace with your private key
-      const infuraUrl = "http://127.0.0.1:7545"; // replace with your Infura URL
+      const privateKey: any = process.env.PRIVATE_KEY; 
+      const infuraUrl = "http://127.0.0.1:7545"; 
       const account = new Web3().eth.accounts.privateKeyToAccount(privateKey);
     this.web3 = new Web3(new Web3.providers.WebsocketProvider(infuraUrl));
 
-
-      
       this.myAddress = account.address;
       this.myBalance = await this.web3.eth.getBalance(this.myAddress);
       this.myBalance = this.web3.utils.fromWei(this.myBalance, 'ether');
@@ -37,33 +40,29 @@ export class Web3Service {
   }
 
   async signRide(contractID: string) {
-
     if (!this.web3) {
       console.error('MetaMask not connected');
       return;
     }
-
+  
     const accounts = await this.web3.eth.getAccounts();
     const selectedAddress = accounts[0];
-
+  
     // Initialize the contract instance
-    this.contract = new this.web3.eth.Contract(
-      contractAbi as AbiItem[],
-      contractID,
-    );
-
+    this.contract = new this.web3.eth.Contract(contractAbi as AbiItem[], contractID);
+  
     const contractBalance = await this.web3.eth.getBalance(contractID);
-    console.log('Contract balance:', this.web3.utils.fromWei(contractBalance, 'ether'));
-    console.log('Contract balance2:', contractBalance);
-    // Call the createContract function
-    const party2Signature = '0x60a7c6066628a615d200e91db865c562c84685fa5817a9defd4b57694604db1b';
-    const gasEstimate = await this.contract.methods
-      .signContract(party2Signature)
-      .estimateGas({ from: selectedAddress });
+    console.log('Contract balance:', contractBalance);
 
+    const part = this.web3.utils.toWei('0.1', 'ether');
+  
+    const gasEstimate = await this.contract.methods
+      .signContract()
+      .estimateGas({ from: selectedAddress, value: part });
+  
     this.contract.methods
-      .signContract(party2Signature)
-      .send({ from: selectedAddress, gas: gasEstimate })
+      .signContract()
+      .send({ from: selectedAddress, value: part, gas: gasEstimate })
       .on('transactionHash', (hash: string) => {
         console.log('Transaction hash:', hash);
       })
@@ -71,12 +70,13 @@ export class Web3Service {
         console.log('Transaction receipt events:', receipt);
         // find the value newContract in receipt.events
         this.rideContractAddress = receipt.events.ContractCreated.returnValues.newContract;
+        console.log('Ride contract address:', this.rideContractAddress);
       })
-
       .on('error', (error: Error) => {
         console.error('Error:', error);
       });
   }
+  
 
   async setRideProviderAcceptedStatus(contractID: string, rideProviderAcceptedStatusMessage: string) {
 
@@ -186,6 +186,7 @@ export class Web3Service {
     this.contract.methods
       .setRideProviderArrivedAtDropoffLocation(rideProviderArrivedAtDropoffLocationMessage)
       .send({ from: selectedAddress, gas: gasEstimate })
+
   }
 
   async claimDeposit(contractID: string) {
@@ -194,6 +195,7 @@ export class Web3Service {
       console.error('MetaMask not connected');
       return;
     }
+    const part = 100;
 
     const accounts = await this.web3.eth.getAccounts();
     const selectedAddress = accounts[0];
@@ -206,13 +208,17 @@ export class Web3Service {
 
     // Estimate gas for the claimDeposit function
     const gasEstimate = await this.contract.methods
-      .claimETH()
+      .claimETH(part)
       .estimateGas({ from: selectedAddress });
 
     // Call the claimDeposit function
     this.contract.methods
-      .claimETH()
+      .claimETH(part)
       .send({ from: selectedAddress, gas: gasEstimate })
+      console.log("Deposit claimed");
+      
+      rideInProcessSwitch();
+    
   }
 
   async listenForUpdates(rideContractAddress: string) {
@@ -241,6 +247,7 @@ export class Web3Service {
       }
       
       if(functionName == "userMarkedRideComplete"){
+        await new Promise(resolve => setTimeout(resolve, 10000));
         this.claimDeposit(rideContractAddress);
         console.log("Super hat alles geklappt");
       }
@@ -248,8 +255,6 @@ export class Web3Service {
     })
     .on('error', console.error);
   }
-
-
 
 }
 

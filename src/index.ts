@@ -1,4 +1,5 @@
 import express, { Application, Request, Response } from 'express';
+import * as elliptic from 'elliptic';
 import { Web3Service } from "./web3Service";
 import { CronJobs } from './cronjobs';
 
@@ -10,9 +11,11 @@ const web3Service = new Web3Service();
 const cronJobs = new CronJobs();
 const port = process.env.PORT;
 const serviceName = process.env.SERVICE_NAME
-let contractAddress: string = "";
 
+let contractAddress: string = "";
 let rideInProcess: boolean = false;
+
+const keyPair = generateKeyPair();
 
 export let bidAmount: number = 0;
 
@@ -115,7 +118,7 @@ async function getRideRequests() {
 
 
 async function bidOnRide(rideId: string) {
-  bidAmount = Math.floor(Math.random() * 19) + 6; // random number between 2 and 20
+  bidAmount = Math.floor(Math.random() * 30) + 14; 
   console.log("Service name: ", serviceName);
   console.log("Bid amount: ", bidAmount);
 
@@ -127,7 +130,8 @@ async function bidOnRide(rideId: string) {
     rating: 5,
     model: 'Tesla Model Y',
     estimatedArrivalTime: 5,
-    passengerCount: 0
+    passengerCount: 0,
+    vehiclePublicKey: keyPair.publicKey
   };
   // fetch 'http://localhost:8080/bid' with bid as body
   const response = await fetch(`http://localhost:8080/bid`, {
@@ -139,4 +143,18 @@ async function bidOnRide(rideId: string) {
   })
   return response;
 }
+
+function   generateKeyPair(): any {
+  const ec = new elliptic.ec('secp256k1');
+  const keyPair = ec.genKeyPair();
+
+  const publicKey = keyPair.getPublic('hex');
+  const privateKey = keyPair.getPrivate('hex');
+
+  return {
+    publicKey,
+    privateKey
+  }
+}
+
 

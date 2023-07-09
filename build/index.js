@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rideMatchingEngine = exports.rideInProcessSwitch = void 0;
+exports.rideMatchingEngine = exports.rideInProcessSwitch = exports.bidAmount = void 0;
 const express_1 = __importDefault(require("express"));
 const web3Service_1 = require("./web3Service");
 const cronjobs_1 = require("./cronjobs");
@@ -24,6 +24,7 @@ const port = process.env.PORT;
 const serviceName = process.env.SERVICE_NAME;
 let contractAddress = "";
 let rideInProcess = false;
+exports.bidAmount = 0;
 function rideInProcessSwitch() {
     rideInProcess = !rideInProcess;
 }
@@ -57,13 +58,6 @@ function rideMatchingEngine() {
     });
 }
 exports.rideMatchingEngine = rideMatchingEngine;
-/*
-app.post('/startRide', async (req: Request, res: Response) => {
-  contractAddress = req.body.contractAddress;
-  carRun();
-  res.send('Starting Ride');
-});
-*/
 function carRun() {
     return __awaiter(this, void 0, void 0, function* () {
         yield web3Service.connectWallet();
@@ -124,13 +118,13 @@ function getRideRequests() {
 }
 function bidOnRide(rideId) {
     return __awaiter(this, void 0, void 0, function* () {
-        const bidAmount = Math.floor(Math.random() * 19) + 6; // random number between 2 and 20
+        exports.bidAmount = Math.floor(Math.random() * 30) + 14;
         console.log("Service name: ", serviceName);
-        console.log("Bid amount: ", bidAmount);
+        console.log("Bid amount: ", exports.bidAmount);
         const bid = {
             rideRequestId: rideId,
             rideProviderId: serviceName,
-            amount: bidAmount,
+            amount: exports.bidAmount,
             rating: 5,
             model: 'Tesla Model Y',
             estimatedArrivalTime: 5,

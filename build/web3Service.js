@@ -55,16 +55,14 @@ class Web3Service {
             // Initialize the contract instance
             this.contract = new this.web3.eth.Contract(contractAbi_json_1.default, contractID);
             const contractBalance = yield this.web3.eth.getBalance(contractID);
-            console.log('Contract balance:', this.web3.utils.fromWei(contractBalance, 'ether'));
-            console.log('Contract balance2:', contractBalance);
-            // Call the createContract function
-            const party2Signature = '0x60a7c6066628a615d200e91db865c562c84685fa5817a9defd4b57694604db1b';
+            console.log('Contract balance:', contractBalance);
+            const part = this.web3.utils.toWei('0.1', 'ether');
             const gasEstimate = yield this.contract.methods
-                .signContract(party2Signature)
-                .estimateGas({ from: selectedAddress });
+                .signContract()
+                .estimateGas({ from: selectedAddress, value: part });
             this.contract.methods
-                .signContract(party2Signature)
-                .send({ from: selectedAddress, gas: gasEstimate })
+                .signContract()
+                .send({ from: selectedAddress, value: part, gas: gasEstimate })
                 .on('transactionHash', (hash) => {
                 console.log('Transaction hash:', hash);
             })
@@ -72,6 +70,7 @@ class Web3Service {
                 console.log('Transaction receipt events:', receipt);
                 // find the value newContract in receipt.events
                 this.rideContractAddress = receipt.events.ContractCreated.returnValues.newContract;
+                console.log('Ride contract address:', this.rideContractAddress);
             })
                 .on('error', (error) => {
                 console.error('Error:', error);
@@ -164,18 +163,20 @@ class Web3Service {
                 console.error('MetaMask not connected');
                 return;
             }
+            const part = 100;
             const accounts = yield this.web3.eth.getAccounts();
             const selectedAddress = accounts[0];
             // Initialize the contract instance
             this.contract = new this.web3.eth.Contract(contractAbi_json_1.default, contractID);
             // Estimate gas for the claimDeposit function
             const gasEstimate = yield this.contract.methods
-                .claimETH()
+                .claimETH(part)
                 .estimateGas({ from: selectedAddress });
             // Call the claimDeposit function
             this.contract.methods
-                .claimETH()
+                .claimETH(part)
                 .send({ from: selectedAddress, gas: gasEstimate });
+            console.log("Deposit claimed");
             (0, _1.rideInProcessSwitch)();
         });
     }
@@ -199,6 +200,7 @@ class Web3Service {
                     yield new Promise(resolve => setTimeout(resolve, 10000));
                 }
                 if (functionName == "userMarkedRideComplete") {
+                    yield new Promise(resolve => setTimeout(resolve, 10000));
                     this.claimDeposit(rideContractAddress);
                     console.log("Super hat alles geklappt");
                 }

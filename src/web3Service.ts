@@ -159,6 +159,41 @@ export class Web3Service {
       .send({ from: selectedAddress, gas: gasEstimate })
   }
 
+  async addPassenger(contractID: string, passengerId: string, seatingPosition: number, startTime: string) {
+    if (!this.web3) {
+        console.error('MetaMask not connected');
+        return;
+    }
+
+    const accounts = await this.web3.eth.getAccounts();
+    const selectedAddress = accounts[0];
+
+    // Initialize the contract instance
+    this.contract = new this.web3.eth.Contract(
+        contractAbi as AbiItem[],
+        contractID,
+    );
+
+    // Call the addPassenger function
+    const gasEstimate = await this.contract.methods
+        .addPassenger(passengerId, seatingPosition, startTime)
+        .estimateGas({ from: selectedAddress });
+
+    this.contract.methods
+        .addPassenger(passengerId, seatingPosition, startTime)
+        .send({ from: selectedAddress, gas: gasEstimate })
+        .on('transactionHash', (hash: string) => {
+            console.log('Transaction hash:', hash);
+        })
+        .on('receipt', (receipt: any) => {
+            console.log('Transaction receipt events:', receipt);
+        })
+        .on('error', (error: Error) => {
+            console.error('Error:', error);
+        });
+    }
+
+
 
 
   async setRideProviderArrivedAtDropoffLocation(contractID: string, rideProviderArrivedAtDropoffLocationMessage: string) {

@@ -69,6 +69,9 @@ async function carRun() {
     await web3Service.setRideProviderAcceptedStatus(contractAddress, "Hallo Welt2");
     await new Promise(resolve => setTimeout(resolve, 12000));
 
+    await web3Service.addPassenger(contractAddress, "userAuthPseudonym1", 1, "11:00" );
+    await web3Service.addPassenger(contractAddress, "userAuthPseudonym2", 2, "11:30" );
+
     await web3Service.setRideProviderArrivedAtPickupLocation(contractAddress, "Hallo Welt3");
     await new Promise(resolve => setTimeout(resolve, 12000));
 }

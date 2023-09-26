@@ -64,6 +64,7 @@ class Web3Service {
                 .signContract()
                 .send({ from: selectedAddress, value: part, gas: gasEstimate })
                 .on('transactionHash', (hash) => {
+                console.log('contract signed');
                 console.log('Transaction hash:', hash);
             })
                 .on('receipt', (receipt) => {
@@ -94,7 +95,20 @@ class Web3Service {
             // Call the setRideProviderAcceptedStatus function
             this.contract.methods
                 .setRideProviderAcceptedStatus(rideProviderAcceptedStatusMessage)
-                .send({ from: selectedAddress, gas: gasEstimate });
+                .send({ from: selectedAddress, gas: gasEstimate })
+                .on('transactionHash', (hash) => {
+                console.log('Accepted Ride');
+                console.log('Transaction hash:', hash);
+            })
+                .on('receipt', (receipt) => {
+                console.log('Transaction receipt events:', receipt);
+                // find the value newContract in receipt.events
+                this.rideContractAddress = receipt.events.ContractCreated.returnValues.newContract;
+                console.log('Ride contract address:', this.rideContractAddress);
+            })
+                .on('error', (error) => {
+                console.error('Error:', error);
+            });
         });
     }
     setRideProviderArrivedAtPickupLocation(contractID, rideProviderArrivedAtPickupLocationMessage) {
@@ -114,7 +128,20 @@ class Web3Service {
             // Call the setRideProviderAcceptedStatus function
             this.contract.methods
                 .setRideProviderArrivedAtPickupLocation(rideProviderArrivedAtPickupLocationMessage)
-                .send({ from: selectedAddress, gas: gasEstimate });
+                .send({ from: selectedAddress, gas: gasEstimate })
+                .on('transactionHash', (hash) => {
+                console.log('Arrived at pickup location');
+                console.log('Transaction hash:', hash);
+            })
+                .on('receipt', (receipt) => {
+                console.log('Transaction receipt events:', receipt);
+                // find the value newContract in receipt.events
+                this.rideContractAddress = receipt.events.ContractCreated.returnValues.newContract;
+                console.log('Ride contract address:', this.rideContractAddress);
+            })
+                .on('error', (error) => {
+                console.error('Error:', error);
+            });
         });
     }
     setRideProviderStartedRide(contractID, rideProviderStartedRideMessage) {
@@ -134,7 +161,49 @@ class Web3Service {
             // Call the setRideProviderAcceptedStatus function
             this.contract.methods
                 .setRideProviderStartedRide(rideProviderStartedRideMessage)
-                .send({ from: selectedAddress, gas: gasEstimate });
+                .send({ from: selectedAddress, gas: gasEstimate })
+                .on('transactionHash', (hash) => {
+                console.log('Started Ride');
+                console.log('Transaction hash:', hash);
+            })
+                .on('receipt', (receipt) => {
+                console.log('Transaction receipt events:', receipt);
+                // find the value newContract in receipt.events
+                this.rideContractAddress = receipt.events.ContractCreated.returnValues.newContract;
+                console.log('Ride contract address:', this.rideContractAddress);
+            })
+                .on('error', (error) => {
+                console.error('Error:', error);
+            });
+        });
+    }
+    addPassenger(contractID, passengerId, seatingPosition, startTime) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.web3) {
+                console.error('MetaMask not connected');
+                return;
+            }
+            const accounts = yield this.web3.eth.getAccounts();
+            const selectedAddress = accounts[0];
+            // Initialize the contract instance
+            this.contract = new this.web3.eth.Contract(contractAbi_json_1.default, contractID);
+            // Call the addPassenger function
+            const gasEstimate = yield this.contract.methods
+                .addPassenger(passengerId, seatingPosition, startTime)
+                .estimateGas({ from: selectedAddress });
+            this.contract.methods
+                .addPassenger(passengerId, seatingPosition, startTime)
+                .send({ from: selectedAddress, gas: gasEstimate })
+                .on('transactionHash', (hash) => {
+                console.log('Add Passenger');
+                console.log('Transaction hash:', hash);
+            })
+                .on('receipt', (receipt) => {
+                console.log('Transaction receipt events:', receipt);
+            })
+                .on('error', (error) => {
+                console.error('Error:', error);
+            });
         });
     }
     setRideProviderArrivedAtDropoffLocation(contractID, rideProviderArrivedAtDropoffLocationMessage) {
@@ -154,7 +223,20 @@ class Web3Service {
             // Call the setRideProviderAcceptedStatus function
             this.contract.methods
                 .setRideProviderArrivedAtDropoffLocation(rideProviderArrivedAtDropoffLocationMessage)
-                .send({ from: selectedAddress, gas: gasEstimate });
+                .send({ from: selectedAddress, gas: gasEstimate })
+                .on('transactionHash', (hash) => {
+                console.log('Arrived at dropoff location');
+                console.log('Transaction hash:', hash);
+            })
+                .on('receipt', (receipt) => {
+                console.log('Transaction receipt events:', receipt);
+                // find the value newContract in receipt.events
+                this.rideContractAddress = receipt.events.ContractCreated.returnValues.newContract;
+                console.log('Ride contract address:', this.rideContractAddress);
+            })
+                .on('error', (error) => {
+                console.error('Error:', error);
+            });
         });
     }
     claimDeposit(contractID) {
@@ -175,7 +257,20 @@ class Web3Service {
             // Call the claimDeposit function
             this.contract.methods
                 .claimETH(part)
-                .send({ from: selectedAddress, gas: gasEstimate });
+                .send({ from: selectedAddress, gas: gasEstimate })
+                .on('transactionHash', (hash) => {
+                console.log('Claim Deposit');
+                console.log('Transaction hash:', hash);
+            })
+                .on('receipt', (receipt) => {
+                console.log('Transaction receipt events:', receipt);
+                // find the value newContract in receipt.events
+                this.rideContractAddress = receipt.events.ContractCreated.returnValues.newContract;
+                console.log('Ride contract address:', this.rideContractAddress);
+            })
+                .on('error', (error) => {
+                console.error('Error:', error);
+            });
             console.log("Deposit claimed");
             (0, _1.rideInProcessSwitch)();
         });

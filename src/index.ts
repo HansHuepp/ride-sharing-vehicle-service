@@ -66,13 +66,13 @@ async function carRun() {
     await web3Service.listenForUpdates(contractAddress);
     await new Promise(resolve => setTimeout(resolve, 12000));
 
-    await web3Service.setRideProviderAcceptedStatus(contractAddress, "Hallo Welt2");
+    await web3Service.setRideProviderAcceptedStatus(contractAddress, "");
     await new Promise(resolve => setTimeout(resolve, 12000));
 
     await web3Service.addPassenger(contractAddress, "userAuthPseudonym1", 1, "11:00" );
     await web3Service.addPassenger(contractAddress, "userAuthPseudonym2", 2, "11:30" );
 
-    await web3Service.setRideProviderArrivedAtPickupLocation(contractAddress, "Hallo Welt3");
+    await web3Service.setRideProviderArrivedAtPickupLocation(contractAddress, "");
     await new Promise(resolve => setTimeout(resolve, 12000));
 }
 
@@ -133,7 +133,7 @@ async function bidOnRide(rideId: string) {
     rating: 5,
     model: 'Tesla Model Y',
     estimatedArrivalTime: 5,
-    passengerCount: 0,
+    passengerCount: 2,
     vehiclePublicKey: keyPair.publicKey
   };
   // fetch 'http://localhost:8080/bid' with bid as body
